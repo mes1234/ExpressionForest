@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpressionForest;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,8 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Playground;
-internal class InspectingVisitor : ExpressionVisitor
+internal class GolangVisitor : ExpressionVisitor
 {
+    private readonly ICollection<Token> _tokens;
+
+
+    public GolangVisitor()
+    {
+        _tokens = new List<Token>();
+    }
+
     [return: NotNullIfNotNull("node")]
     public override Expression? Visit(Expression? node)
     {
@@ -61,7 +70,7 @@ internal class InspectingVisitor : ExpressionVisitor
             ExpressionType.TypeAs => PrintAndReturn(node),
             ExpressionType.TypeIs => PrintAndReturn(node),
             ExpressionType.Assign => PrintAndReturn(node),
-            ExpressionType.Block => PrintAndReturn(node),
+            ExpressionType.Block => DefineBlock(node),
             ExpressionType.DebugInfo => PrintAndReturn(node),
             ExpressionType.Decrement => PrintAndReturn(node),
             ExpressionType.Dynamic => PrintAndReturn(node),
@@ -110,4 +119,15 @@ internal class InspectingVisitor : ExpressionVisitor
         return base.Visit(node);
     }
 
+    private Expression DefineBlock(Expression block)
+    {
+        _tokens.Add(Token.BlockToken);
+
+        return base.Visit(block);
+    }
+
 }
+
+
+
+
