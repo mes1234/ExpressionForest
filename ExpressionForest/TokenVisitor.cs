@@ -8,14 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ExpressionForest;
-internal class GolangVisitor : ExpressionVisitor
+internal class TokenVisitor : ExpressionVisitor
 {
     private readonly ICollection<Token> _tokens;
 
     private Stack<HashSet<string>> _blockVariablesStack = new Stack<HashSet<string>>();
 
-
-    public GolangVisitor()
+    public TokenVisitor()
     {
         _tokens = new List<Token>();
     }
@@ -175,7 +174,31 @@ internal class GolangVisitor : ExpressionVisitor
 
     private Expression DefineInvocation(InvocationExpression invocation)
     {
-        _tokens.Add(new CallToken(invocation.Expression.ToString()));
+        var lambdaExpr = ((LambdaExpression)invocation.Expression);
+
+        string methodName = "";
+
+        string? argName = null;
+
+        if (lambdaExpr.Body is MethodCallExpression methodCall)
+        {
+            methodName = methodCall.Method.Name;
+
+            var args = invocation.Arguments.FirstOrDefault();
+
+            if (args != null)
+            {
+                argName = ((ParameterExpression)args).Name;
+            }
+        }
+        else
+        {
+            methodName = lambdaExpr.Name ?? string.Empty;
+        }
+
+
+
+        _tokens.Add(new CallToken(methodName, argName));
 
         return invocation;
     }

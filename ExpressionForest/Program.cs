@@ -34,7 +34,7 @@ public static class Program
             runner.DynamicInvoke();
         }
 
-        var visitor = new GolangVisitor();
+        var visitor = new TokenVisitor();
 
         visitor.Visit(program);
 

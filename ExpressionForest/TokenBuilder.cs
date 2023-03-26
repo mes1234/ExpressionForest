@@ -74,9 +74,12 @@ internal class DefineCallableToken : Token
 internal class CallToken : Token
 {
     private readonly string _name;
-    public CallToken(string name) : base(TokenType.Call)
+    private readonly string? _parameter;
+
+    public CallToken(string name, string? parameter) : base(TokenType.Call)
     {
         _name = name;
+        _parameter = parameter;
     }
 }
 
