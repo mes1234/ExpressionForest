@@ -19,9 +19,16 @@ public static class Program
                                 Print(textVarName)
                         );
 
-        var visitor = new GolangVisitor();
+        if (program is LambdaExpression lambdaProgram)
+        {
+            var runner = lambdaProgram.Compile();
 
-        visitor.Visit(program);
+            runner.DynamicInvoke();
+        }
+
+        //var visitor = new GolangVisitor();
+
+        //visitor.Visit(program);
 
         Console.WriteLine("End");
 

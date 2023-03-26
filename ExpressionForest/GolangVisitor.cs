@@ -121,7 +121,7 @@ internal class GolangVisitor : ExpressionVisitor
 
     private Expression DefineBlock(Expression block)
     {
-        _tokens.Add(Token.BlockToken);
+        // _tokens.Add(Token.BlockToken);
 
         return base.Visit(block);
     }
