@@ -41,7 +41,7 @@ internal static class TokenGeneratorExtensions
         return Expression.Invoke((string x) => Console.WriteLine(x), var);
     }
 
-    internal static Expression Run(this BlockGenerator blockGenerator, Expression lambdaExpression)
+    internal static Expression Run(this BlockGenerator _, Expression lambdaExpression)
     {
         return LambdaExpression.Invoke(lambdaExpression);
     }

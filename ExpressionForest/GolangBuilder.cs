@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ExpressionForest;
-internal class GolangBuilder
-{
-
-}
 
 internal abstract class Token
 {
@@ -19,20 +16,19 @@ internal abstract class Token
     }
 }
 
-internal class BlockToken : Token
+internal class BlockStartToken : Token
 {
-    private readonly string _name;
-
-    private readonly ICollection<Token> _innerTokens;
-
-    public BlockToken(string name) : base(TokenType.FunctionDefinition)
+    public BlockStartToken() : base(TokenType.FunctionDefinitionStart)
     {
-        _name = name;
-        _innerTokens = new List<Token>();
+
     }
+}
+internal class BlockStopToken : Token
+{
+    public BlockStopToken() : base(TokenType.FunctionDefinitionEnd)
+    {
 
-    public void Attach(Token token) => _innerTokens.Add(token);
-
+    }
 }
 
 internal class VariableToken : Token
@@ -49,13 +45,13 @@ internal class VariableToken : Token
 
 internal class AssignmentToken : Token
 {
-    private readonly VariableToken _left;
-    private readonly object _right;
+    private readonly string _left;
+    private readonly string _right;
 
-    public AssignmentToken(VariableToken variableToken, object value) : base(TokenType.Assignment)
+    public AssignmentToken(string left, string right) : base(TokenType.Assignment)
     {
-        _left = variableToken;
-        _right = value;
+        _left = left;
+        _right = right;
 
         //TODO validate type match!
     }
@@ -64,21 +60,33 @@ internal class AssignmentToken : Token
 /// <summary>
 /// Only no argument calls are supported for now
 /// </summary>
+internal class DefineCallableToken : Token
+{
+    private readonly string _name;
+    public DefineCallableToken(string name) : base(TokenType.CallableDefinition)
+    {
+        _name = name;
+    }
+}
+/// <summary>
+/// Only no argument calls are supported for now
+/// </summary>
 internal class CallToken : Token
 {
-    private readonly BlockToken _blockToken;
-
-    public CallToken(BlockToken blockToken) : base(TokenType.Call)
+    private readonly string _name;
+    public CallToken(string name) : base(TokenType.Call)
     {
-        _blockToken = blockToken;
+        _name = name;
     }
 }
 
 internal enum TokenType
 {
     VariableDefinition,
-    FunctionDefinition,
+    FunctionDefinitionStart,
+    FunctionDefinitionEnd,
     Call,
+    CallableDefinition,
     Assignment
 }
 

@@ -12,6 +12,8 @@ internal class GolangVisitor : ExpressionVisitor
 {
     private readonly ICollection<Token> _tokens;
 
+    private Stack<HashSet<string>> _blockVariablesStack = new Stack<HashSet<string>>();
+
 
     public GolangVisitor()
     {
@@ -40,8 +42,8 @@ internal class GolangVisitor : ExpressionVisitor
             ExpressionType.ExclusiveOr => PrintAndReturn(node),
             ExpressionType.GreaterThan => PrintAndReturn(node),
             ExpressionType.GreaterThanOrEqual => PrintAndReturn(node),
-            ExpressionType.Invoke => PrintAndReturn(node),
-            ExpressionType.Lambda => PrintAndReturn(node),
+            ExpressionType.Invoke => DefineInvocation((InvocationExpression)node),
+            ExpressionType.Lambda => DefineLambda((LambdaExpression)node),
             ExpressionType.LeftShift => PrintAndReturn(node),
             ExpressionType.LessThan => PrintAndReturn(node),
             ExpressionType.LessThanOrEqual => PrintAndReturn(node),
@@ -61,7 +63,7 @@ internal class GolangVisitor : ExpressionVisitor
             ExpressionType.NotEqual => PrintAndReturn(node),
             ExpressionType.Or => PrintAndReturn(node),
             ExpressionType.OrElse => PrintAndReturn(node),
-            ExpressionType.Parameter => PrintAndReturn(node),
+            ExpressionType.Parameter => DefineParameter((ParameterExpression)node),
             ExpressionType.Power => PrintAndReturn(node),
             ExpressionType.Quote => PrintAndReturn(node),
             ExpressionType.RightShift => PrintAndReturn(node),
@@ -69,8 +71,8 @@ internal class GolangVisitor : ExpressionVisitor
             ExpressionType.SubtractChecked => PrintAndReturn(node),
             ExpressionType.TypeAs => PrintAndReturn(node),
             ExpressionType.TypeIs => PrintAndReturn(node),
-            ExpressionType.Assign => PrintAndReturn(node),
-            ExpressionType.Block => PrintAndReturn(node),
+            ExpressionType.Assign => DefineAssign((BinaryExpression)node),
+            ExpressionType.Block => DefineBlock((BlockExpression)node),
             ExpressionType.DebugInfo => PrintAndReturn(node),
             ExpressionType.Decrement => PrintAndReturn(node),
             ExpressionType.Dynamic => PrintAndReturn(node),
@@ -116,14 +118,66 @@ internal class GolangVisitor : ExpressionVisitor
     {
         Console.WriteLine($"Obtained Expression Node : {node.NodeType}");
 
-        return base.Visit(node);
+        return node;
     }
 
-    private Expression DefineBlock(Expression block)
+    private Expression DefineBlock(BlockExpression block)
     {
-        // _tokens.Add(Token.BlockToken);
+        // Init new block
+        _blockVariablesStack.Push(new HashSet<string>());
 
-        return base.Visit(block);
+        _tokens.Add(new BlockStartToken());
+
+        base.Visit(block);
+
+        _tokens.Add(new BlockStopToken());
+
+        _blockVariablesStack.Pop();
+
+        return block;
+    }
+
+    private Expression DefineAssign(BinaryExpression assignment)
+    {
+        _tokens.Add(new AssignmentToken(assignment.Left.ToString(), assignment.Right.ToString()));
+
+        return assignment;
+    }
+
+    private Expression DefineLambda(LambdaExpression lambda)
+    {
+        // Add definition only to user defined functions
+        if (lambda.Name != null)
+        {
+            _tokens.Add(new DefineCallableToken(lambda.Name ?? lambda.Body.ToString()));
+
+            return base.Visit(lambda);
+        }
+
+        return lambda;
+    }
+
+    private Expression DefineParameter(ParameterExpression parameter)
+    {
+        //  This is not user defined parameter
+        if (parameter.Name == null) return parameter;
+
+        // This is duplicate within current block
+        if (_blockVariablesStack.Peek().Contains(parameter.Name)) return parameter;
+
+        // Add new Parameter to current block
+        _blockVariablesStack.Peek().Add(parameter.Name);
+
+        _tokens.Add(new VariableToken(parameter.Name, parameter.Type));
+
+        return parameter;
+    }
+
+    private Expression DefineInvocation(InvocationExpression invocation)
+    {
+        _tokens.Add(new CallToken(invocation.Expression.ToString()));
+
+        return invocation;
     }
 
 }

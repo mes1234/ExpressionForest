@@ -8,20 +8,22 @@ public static class Program
     {
         Console.WriteLine("Beginning");
 
-        var textVarName = "text";
+        var innerTextVarName = "innerText";
 
         var subBlock = new BlockGenerator();
-        var subProgram = subBlock.DefineFunction(textVarName,
-            subBlock.DefineVariable(typeof(string), textVarName),
-            subBlock.Assign(textVarName, "Hello World Inner!"),
-            subBlock.Print(textVarName));
+        var subProgram = subBlock.DefineFunction("hello_inner",
+            subBlock.DefineVariable(typeof(string), innerTextVarName),
+            subBlock.Assign(innerTextVarName, "Hello World Inner!"),
+            subBlock.Print(innerTextVarName));
 
+        var outerTextVarName = "outerText";
 
         var block = new BlockGenerator();
-        var program = block.DefineFunction(textVarName,
-             block.DefineVariable(typeof(string), textVarName),
-             block.Assign(textVarName, "Hello World!"),
-             block.Print(textVarName),
+        var program = block.DefineFunction("main",
+             subProgram,
+             block.DefineVariable(typeof(string), outerTextVarName),
+             block.Assign(outerTextVarName, "Hello World!"),
+             block.Print(outerTextVarName),
              block.Run(subProgram));
 
 
