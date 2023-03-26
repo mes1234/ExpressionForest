@@ -32,9 +32,9 @@ public static class Program
             runner.DynamicInvoke();
         }
 
-        //var visitor = new GolangVisitor();
+        var visitor = new GolangVisitor();
 
-        //visitor.Visit(program);
+        visitor.Visit(program);
 
         Console.WriteLine("End");
 

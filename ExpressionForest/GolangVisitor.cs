@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Playground;
+namespace ExpressionForest;
 internal class GolangVisitor : ExpressionVisitor
 {
     private readonly ICollection<Token> _tokens;
@@ -70,7 +70,7 @@ internal class GolangVisitor : ExpressionVisitor
             ExpressionType.TypeAs => PrintAndReturn(node),
             ExpressionType.TypeIs => PrintAndReturn(node),
             ExpressionType.Assign => PrintAndReturn(node),
-            ExpressionType.Block => DefineBlock(node),
+            ExpressionType.Block => PrintAndReturn(node),
             ExpressionType.DebugInfo => PrintAndReturn(node),
             ExpressionType.Decrement => PrintAndReturn(node),
             ExpressionType.Dynamic => PrintAndReturn(node),
