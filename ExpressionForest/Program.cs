@@ -16,9 +16,9 @@ public static class Program
         var subProgram = subBlock.DefineFunction(
             "hello_inner",
             subBlock.DefineArguments((typeof(string), innerTextVarArg)),
-            //  subBlock.DefineVariable(typeof(string), innerTextVarName),
-            //  subBlock.Assign(innerTextVarName, innerTextVarArg),
-            subBlock.Print(innerTextVarArg));
+            subBlock.DefineVariable(typeof(string), innerTextVarName),
+            subBlock.Assign(innerTextVarName, innerTextVarArg),
+            subBlock.Print(innerTextVarName));
 
         var outerTextVarName = "outerText";
 
@@ -27,7 +27,10 @@ public static class Program
              null,
              subProgram,
              block.DefineVariable(typeof(string), outerTextVarName),
-             block.AssignLiteral(outerTextVarName, "Hello World"),
+             block.AssignLiteral(outerTextVarName, "Hello World Inner"),
+             block.Run(subProgram, outerTextVarName),
+              block.AssignLiteral(outerTextVarName, "Hello World"),
+             block.Print(outerTextVarName),
              block.Run(subProgram, outerTextVarName));
 
 

@@ -17,18 +17,10 @@ internal class BlockGenerator
 
     internal Expression DefineFunction(string name, IEnumerable<ParameterExpression>? args, params Expression[] functions)
     {
-        //foreach (var arg in args ?? Enumerable.Empty<ParameterExpression>())
-        //{
-        //    accessibleExpressions.Add(arg.Name ?? "undefined", arg);
-        //}
-
         var lambda = Expression.Lambda(
-             Expression.Block(functions),
+             Expression.Block(accessibleExpressions.Select(x => x.Value), functions),
              name: name,
-             parameters: args);
-
-
-
+             parameters: arguments.Select(x => x.Value).ToArray());
 
         return lambda;
     }
@@ -39,7 +31,7 @@ internal static class TokenGeneratorExtensions
 {
     internal static IEnumerable<ParameterExpression> DefineArguments(this BlockGenerator blockGenerator, params (Type type, string name)[] definitions)
     {
-        var args = definitions.Select(x => Expression.Parameter(x.type, x.name));
+        var args = definitions.Select(x => Expression.Variable(x.type, x.name));
 
         foreach (var arg in args ?? Enumerable.Empty<ParameterExpression>())
         {
@@ -70,20 +62,14 @@ internal static class TokenGeneratorExtensions
     internal static Expression Assign(this BlockGenerator blockGenerator, string paramNameTo, string paramNameFrom)
     {
         var left = blockGenerator.accessibleExpressions[paramNameTo];
+        var right = blockGenerator.arguments[paramNameFrom];
 
-        if (blockGenerator.accessibleExpressions.ContainsKey(paramNameFrom))
-        {
-            return Expression.Assign(left, blockGenerator.accessibleExpressions[paramNameFrom]);
-        }
-
-        return Expression.Assign(left, blockGenerator.arguments[paramNameFrom]);
-
+        return Expression.Assign(left, right);
     }
-
 
     internal static Expression Print(this BlockGenerator blockGenerator, string paramName)
     {
-        var var = blockGenerator.arguments[paramName];
+        var var = blockGenerator.accessibleExpressions[paramName];
 
         return Expression.Invoke((string x) => Console.WriteLine(x), var);
     }
