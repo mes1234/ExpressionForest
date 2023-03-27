@@ -13,8 +13,7 @@ public static class Program
         var innerTextVarName = "innerText";
 
         var subBlock = new BlockGenerator();
-        var subProgram = subBlock.DefineFunction(
-            "hello_inner",
+        var subProgram = subBlock.DefineFunction("hello_inner",
             subBlock.DefineArguments((typeof(string), innerTextVarArg)),
             subBlock.DefineVariable(typeof(string), innerTextVarName),
             subBlock.Assign(innerTextVarName, innerTextVarArg),

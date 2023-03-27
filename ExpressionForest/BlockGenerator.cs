@@ -15,7 +15,7 @@ internal class BlockGenerator
     internal readonly Dictionary<string, ParameterExpression> accessibleExpressions = new();
     internal readonly Dictionary<string, ParameterExpression> arguments = new();
 
-    internal Expression DefineFunction(string name, IEnumerable<ParameterExpression>? args, params Expression[] functions)
+    internal Expression DefineFunction(string name, IEnumerable<ParameterExpression>? _, params Expression[] functions)
     {
         var lambda = Expression.Lambda(
              Expression.Block(accessibleExpressions.Select(x => x.Value), functions),
@@ -29,7 +29,7 @@ internal class BlockGenerator
 
 internal static class TokenGeneratorExtensions
 {
-    internal static IEnumerable<ParameterExpression> DefineArguments(this BlockGenerator blockGenerator, params (Type type, string name)[] definitions)
+    internal static IEnumerable<ParameterExpression>? DefineArguments(this BlockGenerator blockGenerator, params (Type type, string name)[] definitions)
     {
         var args = definitions.Select(x => Expression.Variable(x.type, x.name));
 
