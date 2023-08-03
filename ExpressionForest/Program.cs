@@ -32,7 +32,7 @@ public static class Program
              block.Print(outerTextVarName),
              block.Run(subProgram, outerTextVarName));
 
-
+        Console.WriteLine("yello");
         if (program is LambdaExpression lambdaProgram)
         {
             var runner = lambdaProgram.Compile();
